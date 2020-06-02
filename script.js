@@ -10,6 +10,8 @@ const go = () => {
   const scale = document.getElementById('scale').value;
   const precision = document.getElementById('precision').value;
 
+  document.getElementById('inputPath').setAttribute('d', path);
+
   const svgArray = [];
   let term = '';
   let hasDecimal = false;
