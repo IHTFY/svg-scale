@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SVG Path Scaler</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script defer src="script.js"></script>
+  </head>
+  <body>
+    <h1 class="header center-align">SVG Path Scaler</h1>
+
+    <div class="container">
+      <div class="section">
+        <div class="row">
+          <h2 class="header">Input</h2>
+          <div class="col s12">
+            <div class="input-field">
+              <textarea id="path" class="materialize-textarea"></textarea>
+              <label for="path">SVG Path</label>
+            </div>
+          </div>
+
+          <div class="col s3">
+            <div class="input-field">
+              <input value="1" id="scale" type="number" class="validate" />
+              <label for="scale">Scale Value</label>
+            </div>
+          </div>
+          <div class="col s4">
+            <p class="range-field">
+              <input type="range" id="precision" value="4" min="1" max="16" />
+              <label for="precision">Precision</label>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="row">
+          <div class="col s6">
+            <h2 class="header">Scaled Output</h2>
+          </div>
+          <div class="col s6">
+            <h2>
+              <a
+                class="waves-effect waves-light btn-large indigo"
+                id="copyButton"
+                >Copy</a
+              >
+            </h2>
+          </div>
+          <div class="multiline" id="output"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
