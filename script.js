@@ -81,25 +81,19 @@ const go = () => {
   const bbIn = document.getElementById('inputPath').getBBox();
   const bbOut = document.getElementById('outputPath').getBBox();
 
-  let bb;
-  let ix = 0;
-  let iy = 0;
-  let ox = 0;
-  let oy = 0;
+  const offset = {
+    x: Math.abs(bbIn.width - bbOut.width) / 2,
+    y: Math.abs(bbIn.height - bbOut.height) / 2
+  };
+
   if (bbIn.width >= bbOut.width) {
-    bb = bbIn;
-    ox = (bbIn.width - bbOut.width) / 2;
-    oy = (bbIn.height - bbOut.height) / 2;
+    document.getElementById('svgInput').setAttribute('viewBox', `${bbIn.x} ${bbIn.y} ${bbIn.width} ${bbIn.height}`)
+    document.getElementById('svgOutput').setAttribute('viewBox', `${bbOut.x - offset.x} ${bbOut.y - offset.y} ${bbIn.width} ${bbIn.height}`);
   } else {
-    bb = bbOut;
-    ix = (bbOut.width - bbIn.width) / 2;
-    iy = (bbOut.height - bbIn.height) / 2;
+    document.getElementById('svgInput').setAttribute('viewBox', `${bbIn.x - offset.x} ${bbIn.y - offset.y} ${bbOut.width} ${bbOut.height}`)
+    document.getElementById('svgOutput').setAttribute('viewBox', `${bbOut.x} ${bbOut.y} ${bbOut.width} ${bbOut.height}`);
   }
 
-  console.log(bbIn,bbOut,ox,oy,ix,iy);
-
-  document.getElementById('svgInput').setAttribute('viewBox', `${bbIn.x - ix} ${bbIn.y - iy} ${bb.width} ${bb.height}`)
-  document.getElementById('svgOutput').setAttribute('viewBox', `${bbOut.x - ox} ${bbOut.y - oy} ${bb.width} ${bb.height}`);
 }
 
 document.getElementById('path').addEventListener('input', go);
