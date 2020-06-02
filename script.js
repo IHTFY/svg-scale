@@ -56,7 +56,7 @@ const go = () => {
     .join(' ')
     .replace(/\s*([A-Za-z])\s*/g, '$1')
     .replace(/ -/g, '-')
-    .replace(/[^0-9A-Za-z\-]0\./g, '.');
+    .replace(/-0\./g,'-.');
 
   document.getElementById('output').textContent = scaledPath;
 
@@ -65,14 +65,27 @@ const go = () => {
   const output = document.getElementById('output').textContent;
   document.getElementById('outputPath').setAttribute('d', output);
 
-  
+
   const bbIn = document.getElementById('inputPath').getBBox();
   const bbOut = document.getElementById('outputPath').getBBox();
 
-  const bb = bbIn.width > bbOut.width ? bbIn : bbOut;
-  
-  document.getElementById('svgInput').setAttribute('viewBox', `${bb.x} ${bb.y} ${bb.width} ${bb.height}`)
-  document.getElementById('svgOutput').setAttribute('viewBox', `${bb.x} ${bb.y} ${bb.width} ${bb.height}`);
+  let bb;
+  let ix = 0;
+  let iy = 0;
+  let ox = 0;
+  let oy = 0;
+  if (bbIn.width >= bbOut.width) {
+    bb = bbIn;
+    ox = Math.abs(bbIn.x - bbOut.x);
+    oy = Math.abs(bbIn.y - bbOut.y);
+  } else {
+    bb = bbOut;
+    ix = Math.abs(bbIn.x - bbOut.x);
+    iy = Math.abs(bbIn.y - bbOut.y);
+  }
+
+  document.getElementById('svgInput').setAttribute('viewBox', `${bb.x - ix} ${bb.y - iy} ${bb.width} ${bb.height}`)
+  document.getElementById('svgOutput').setAttribute('viewBox', `${bb.x - ox} ${bb.y - oy} ${bb.width} ${bb.height}`);
 }
 
 document.getElementById('path').addEventListener('input', go);

@@ -26,14 +26,14 @@
                   <textarea
                     id="path"
                     class="materialize-textarea"
-                    placeholder="M4.5 24V0h15v4H9.3v5.6h9.9v4H9.3v1.1H4.5z"
+                    placeholder="M2 12V0h7v2H4v3h5v2H4v5H2z"
                   ></textarea>
                   <label for="path">SVG Path</label>
                 </div>
               </div>
               <div class="col s3">
                 <div class="input-field">
-                  <input value="1" id="scale" type="number" class="validate" />
+                  <input value="2" id="scale" type="number" class="validate" />
                   <label for="scale">Scale Value</label>
                 </div>
               </div>
@@ -57,14 +57,14 @@
               <h2 class="header">Scaled Output</h2>
             </div>
             <div class="col s12">
+              <div class="multiline" id="output"></div>
+            </div>
+            <div class="col s12">
               <a
                 class="waves-effect waves-light btn-large indigo left"
                 id="copyButton"
                 >Copy</a
               >
-            </div>
-            <div class="col s12">
-              <div class="multiline" id="output"></div>
             </div>
           </div>
         </div>
@@ -77,26 +77,20 @@
               id="svgInput"
               width="100%"
               height="100%"
-              viewBox="-500 -500 1500 1500"
+              viewBox="-100 -100 200 200"
             >
-              <path
-                id="inputPath"
-                d="M4.523,23.758V0h14.712v4.021H9.319v5.625h9.916v4.016H9.319v10.096H4.523z"
-              />
+              <path id="inputPath" d="" />
             </svg>
           </div>
           <div class="col s6">
             <svg
-            id="svgOutput"
-            width="100%"
-            height="100%"
-            viewBox="-500 -500 1500 1500"
-          >
-            <path
-              id="outputPath"
-              d="M4.523,23.758V0h14.712v4.021H9.319v5.625h9.916v4.016H9.319v10.096H4.523z"
-            />
-          </svg>
+              id="svgOutput"
+              width="100%"
+              height="100%"
+              viewBox="-100 -100 200 200"
+            >
+              <path id="outputPath" d="" />
+            </svg>
           </div>
         </div>
       </div>
