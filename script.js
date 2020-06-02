@@ -10,8 +10,6 @@ const go = () => {
   const scale = document.getElementById('scale').value;
   const precision = document.getElementById('precision').value;
 
-  document.getElementById('inputPath').setAttribute('d', path);
-
   const svgArray = [];
   let term = '';
   let hasDecimal = false;
@@ -35,7 +33,7 @@ const go = () => {
       continue;
     }
     if (/\d/.test(symbol)) {
-      term += symbol;
+      term += `${symbol}`;
       continue;
     }
     if (symbol === '.') {
@@ -58,9 +56,23 @@ const go = () => {
     .join(' ')
     .replace(/\s*([A-Za-z])\s*/g, '$1')
     .replace(/ -/g, '-')
-    .replace(/0\./g, '.');
+    .replace(/[^0-9A-Za-z\-]0\./g, '.');
 
   document.getElementById('output').textContent = scaledPath;
+
+
+  document.getElementById('inputPath').setAttribute('d', path);
+  const output = document.getElementById('output').textContent;
+  document.getElementById('outputPath').setAttribute('d', output);
+
+  
+  const bbIn = document.getElementById('inputPath').getBBox();
+  const bbOut = document.getElementById('outputPath').getBBox();
+
+  const bb = bbIn.width > bbOut.width ? bbIn : bbOut;
+  
+  document.getElementById('svgInput').setAttribute('viewBox', `${bb.x} ${bb.y} ${bb.width} ${bb.height}`)
+  document.getElementById('svgOutput').setAttribute('viewBox', `${bb.x} ${bb.y} ${bb.width} ${bb.height}`);
 }
 
 document.getElementById('path').addEventListener('input', go);
