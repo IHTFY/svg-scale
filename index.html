@@ -17,15 +17,28 @@
 
     <div class="container">
       <div class="section">
+        <h2 class="header">Input</h2>
         <div class="row">
-          <h2 class="header">Input</h2>
-          <div class="col s12">
+          <div class="col s7">
             <div class="input-field">
-              <textarea id="path" class="materialize-textarea" placeholder="M4.5 24V0h15v4H9.3v5.6h9.9v4H9.3v1.1H4.5z"></textarea>
+              <textarea
+                id="path"
+                class="materialize-textarea"
+                placeholder="M4.5 24V0h15v4H9.3v5.6h9.9v4H9.3v1.1H4.5z"
+              ></textarea>
               <label for="path">SVG Path</label>
             </div>
           </div>
-
+          <div class="col s5">
+            <svg>
+              <path
+                id="inputPath"
+                d="M4.523,23.758V0h14.712v4.021H9.319v5.625h9.916v4.016H9.319v10.096H4.523z"
+              />
+            </svg>
+          </div>
+        </div>
+        <div class="row">
           <div class="col s3">
             <div class="input-field">
               <input value="1" id="scale" type="number" class="validate" />
