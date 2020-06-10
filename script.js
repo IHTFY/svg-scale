@@ -26,21 +26,27 @@ const go = () => {
   let term = '';
   let hasDecimal = false;
 
-  const add = () => {
-    if (term.length) {
-      svgArray.push(term);
-      term = '';
-      hasDecimal = false;
+  const add = t => {
+    if (t.length) {
+      if (/^0+[0-9]/.test(t)) {
+        add('0');
+        add(t.substr(1));
+        console.log(0, t.substr(1));
+      } else {
+        svgArray.push(t);
+        term = '';
+        hasDecimal = false;
+      }
     }
   }
 
   for (let symbol of path.trim()) {
     if (/\s|,/.test(symbol)) {
-      add();
+      add(term);
       continue;
     }
     if (/[A-Za-z]/.test(symbol)) {
-      add();
+      add(term);
       svgArray.push(symbol);
       continue;
     }
@@ -50,18 +56,18 @@ const go = () => {
     }
     if (symbol === '.') {
       if (hasDecimal) {
-        add();
+        add(term);
         term += '0';
       }
       term += symbol;
       hasDecimal = true;
     }
     if (symbol === '-') {
-      add();
+      add(term);
       term += symbol;
     }
   }
-  add();
+  add(term);
 
   const scaledPath = svgArray
     .map(i => /\d/.test(i) ? parseFloat(parseFloat(i * scale).toPrecision(precision)) : i)
