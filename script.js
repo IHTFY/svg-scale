@@ -22,7 +22,7 @@ const go = () => {
   const scale = document.getElementById('scale').value;
   const precision = document.getElementById('precision').value;
 
-  const svgArray = [];
+  let svgArray = [];
   let term = '';
   let hasDecimal = false;
 
@@ -69,12 +69,30 @@ const go = () => {
   }
   add(term);
 
+  
+  for (let i = 0; i < svgArray.length; i++) {
+    if (/\d/.test(svgArray[i])) {
+      // number
+      svgArray[i] = parseFloat(parseFloat(svgArray[i] * scale).toPrecision(precision)); // rx, scale
+    } else {
+      // do arcs manually
+      if (svgArray[i] === 'A' || svgArray[i] === 'a') {
+        svgArray[i + 1] = parseFloat(parseFloat(svgArray[i + 1] * scale).toPrecision(precision)); // rx, scale
+        svgArray[i + 2] = parseFloat(parseFloat(svgArray[i + 2] * scale).toPrecision(precision)); // ry, scale
+        // +3 rotation, don't change
+        // +4 boolean flag, don't change
+        // +5 boolean flag, don't change
+        i += 5; // skip to next argument
+      }
+    }
+  }
+
   const scaledPath = svgArray
-    .map(i => /\d/.test(i) ? parseFloat(parseFloat(i * scale).toPrecision(precision)) : i)
     .join(' ')
     .replace(/\s*([A-Za-z])\s*/g, '$1')
     .replace(/ -/g, '-')
     .replace(/-0\./g, '-.');
+
 
   document.getElementById('output').textContent = scaledPath;
 
