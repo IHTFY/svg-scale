@@ -1,0 +1,9 @@
+{
+  "name": "svg-scale",
+  "private": true,
+  "description": "Scale an SVG path directly, with rounding and compression",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "license": "UNLICENSED"
+}
