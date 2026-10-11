@@ -71,6 +71,12 @@ $('mode').addEventListener('change', () => {
   go();
 });
 
+$('exampleButton').addEventListener('click', () => {
+  $('path').value = 'M2 12V0h7v2H4v3h5v2H4v5H2z';
+  go();
+  $('path').focus();
+});
+
 const copyText = text => {
   if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
   return new Promise((resolve, reject) => {
