@@ -59,6 +59,20 @@ const go = () => {
   show(r.output, err, stats, r.paths.join(' '), r.outPaths.join(' '));
 };
 
+// scale slider is logarithmic (0.01x to 100x); the number box stays authoritative
+const sliderToScale = v => Number((10 ** v).toPrecision(3));
+const syncSlider = () => {
+  const v = Number($('scale').value);
+  if (v > 0 && isFinite(v)) $('scaleSlider').value = Math.min(2, Math.max(-2, Math.log10(v)));
+};
+
+$('scaleSlider').addEventListener('input', () => {
+  $('scale').value = sliderToScale(Number($('scaleSlider').value));
+  go();
+});
+$('scale').addEventListener('input', syncSlider);
+$('precision').addEventListener('input', () => { $('precisionOut').textContent = $('precision').value; });
+
 ['path', 'scale', 'precision', 'mode', 'minify', 'optimize'].forEach(id => {
   $(id).addEventListener('input', go);
   $(id).addEventListener('change', go);
@@ -68,6 +82,7 @@ $('mode').addEventListener('change', () => {
   const sig = $('mode').value === 'sig';
   $('precision').min = sig ? 1 : 0;
   $('precision').value = sig ? 6 : 3;
+  $('precisionOut').textContent = $('precision').value;
   go();
 });
 
@@ -107,4 +122,5 @@ $('copyButton').addEventListener('click', () => {
   );
 });
 
+syncSlider();
 go();

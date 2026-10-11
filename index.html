@@ -55,11 +55,22 @@
             placeholder="M2 12V0h7v2H4v3h5v2H4v5H2z"
           ></textarea>
         </div>
-        <div class="controls">
-          <div class="field">
-            <label for="scale">Scale</label>
-            <input value="2" id="scale" type="number" step="any" inputmode="decimal" />
+        <div class="field">
+          <label for="scale">Scale</label>
+          <div class="pair">
+            <input value="2" id="scale" type="number" step="any" inputmode="decimal" aria-label="Scale value" />
+            <input
+              id="scaleSlider"
+              type="range"
+              min="-2"
+              max="2"
+              step="any"
+              aria-label="Scale slider, logarithmic from 0.01 to 100"
+            />
           </div>
+          <div class="ticks" aria-hidden="true"><span>0.01×</span><span>0.1×</span><span>1×</span><span>10×</span><span>100×</span></div>
+        </div>
+        <div class="controls">
           <div class="field">
             <label for="mode">Rounding</label>
             <select id="mode">
@@ -68,8 +79,8 @@
             </select>
           </div>
           <div class="field">
-            <label for="precision">Precision</label>
-            <input value="3" id="precision" type="number" min="0" max="16" step="1" inputmode="numeric" />
+            <label for="precision">Precision: <output id="precisionOut" for="precision">3</output></label>
+            <input value="3" id="precision" type="range" min="0" max="16" step="1" />
           </div>
         </div>
         <div class="switches">
