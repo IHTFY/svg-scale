@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SVG Path Scaler</title>
     <link rel="stylesheet" href="styles.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
-    />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script defer src="svgpath.js"></script>
     <script defer src="script.js"></script>
 
     <!-- Google Auto Ads -->
@@ -20,8 +16,8 @@
     ></script>
   </head>
   <body>
-    <h1 class="header center-align">
-      SVG Path Scaler<a href="https://github.com/IHTFY/svg-scale">
+    <h1 class="header">
+      SVG Path Scaler<a href="https://github.com/IHTFY/svg-scale" aria-label="Source on GitHub">
         <svg id="gh_logo" height="32" width="32">
           <path
             fill="#ee6e73"
@@ -31,85 +27,63 @@
       </a>
     </h1>
 
-    <div class="container">
-      <div class="section">
-        <div class="row">
-          <div class="col s6">
-            <h2 class="header">Input</h2>
-            <div class="row">
-              <div class="col s12">
-                <div class="input-field">
-                  <textarea
-                    id="path"
-                    class="materialize-textarea"
-                    placeholder="M2 12V0h7v2H4v3h5v2H4v5H2z"
-                  ></textarea>
-                  <label for="path">SVG Path</label>
-                </div>
-              </div>
-              <div class="col s12 m4 l3">
-                <div class="input-field">
-                  <input value="2" id="scale" type="number" class="validate" />
-                  <label for="scale">Scale Value</label>
-                </div>
-              </div>
-              <div class="col s12 m8 l9">
-                <p class="range-field">
-                  <input
-                    type="range"
-                    id="precision"
-                    value="4"
-                    min="1"
-                    max="16"
-                  />
-                  <label for="precision">Precision</label>
-                </p>
-              </div>
+    <main class="container">
+      <section class="cols">
+        <div>
+          <h2 class="header">Input</h2>
+          <div class="field">
+            <label for="path">SVG Path</label>
+            <textarea
+              id="path"
+              spellcheck="false"
+              placeholder="M2 12V0h7v2H4v3h5v2H4v5H2z   (or paste d=&quot;…&quot; / a full &lt;svg&gt; snippet)"
+            ></textarea>
+          </div>
+          <div class="controls">
+            <div class="field">
+              <label for="scale">Scale Value</label>
+              <input value="2" id="scale" type="number" step="any" />
+            </div>
+            <div class="field">
+              <label for="mode">Rounding</label>
+              <select id="mode">
+                <option value="dec" selected>Decimal places</option>
+                <option value="sig">Significant digits</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="precision">Precision</label>
+              <input value="3" id="precision" type="number" min="0" max="16" step="1" />
             </div>
           </div>
-
-          <div class="col s6">
-            <div class="col s12">
-              <h2 class="header">Scaled Output</h2>
-            </div>
-            <div class="col s12">
-              <div class="multiline" id="output"></div>
-            </div>
-            <div class="col s12">
-              <a
-                class="waves-effect waves-light btn-large indigo left"
-                id="copyButton"
-                >Copy</a
-              >
-            </div>
-          </div>
+          <label class="option">
+            <input type="checkbox" id="minify" checked />
+            Minify (strip zeros, separators, repeated commands, pack arc flags)
+          </label>
+          <label class="option">
+            <input type="checkbox" id="optimize" checked />
+            Optimize (H/V, S/T shorthands, shortest relative/absolute)
+          </label>
         </div>
-      </div>
 
-      <div class="section">
-        <div class="row">
-          <div class="col s6">
-            <svg
-              id="svgInput"
-              width="100%"
-              height="100%"
-              viewBox="-100 -100 200 200"
-            >
-              <path id="inputPath" d="" />
-            </svg>
-          </div>
-          <div class="col s6">
-            <svg
-              id="svgOutput"
-              width="100%"
-              height="100%"
-              viewBox="-100 -100 200 200"
-            >
-              <path id="outputPath" d="" />
-            </svg>
-          </div>
+        <div>
+          <h2 class="header">Scaled Output</h2>
+          <div id="output"></div>
+          <p class="error" id="error" role="alert"></p>
+          <p class="muted" id="stats"></p>
+          <button type="button" id="copyButton">Copy</button>
         </div>
-      </div>
-    </div>
+      </section>
+
+      <section class="cols">
+        <svg id="svgInput" width="100%" viewBox="-100 -100 200 200" aria-label="Input path preview">
+          <path id="inputPath" d="" />
+        </svg>
+        <svg id="svgOutput" width="100%" viewBox="-100 -100 200 200" aria-label="Scaled path preview">
+          <path id="outputPath" d="" />
+        </svg>
+      </section>
+    </main>
+    <div id="toast" role="status" aria-live="polite"></div>
   </body>
 </html>

@@ -1,133 +1,104 @@
-M.AutoInit();
-document.addEventListener('DOMContentLoaded', function () {
-  var ranges = document.querySelectorAll('input[type=range]');
-  M.Range.init(ranges);
-});
+const $ = id => document.getElementById(id);
 
-// function vbFromCenter(cx, cy, w, h) {
-//   return `${cx - w / 2} ${cy - h / 2} ${w} ${h}`;
-// }
+const NS_PAD = 0.05;
 
-// function getVBCenter(vb) {
-//   [x, y, w, h] = vb.split(' ');
-//   return ({
-//     cx: x + w / 2,
-//     cy: y + h / 2
-//   });
-// }
-
-const go = () => {
-
-  const path = document.getElementById('path').value;
-  const scale = document.getElementById('scale').value;
-  const precision = document.getElementById('precision').value;
-
-  let svgArray = [];
-  let term = '';
-  let hasDecimal = false;
-
-  const add = t => {
-    if (t.length) {
-      if (/^0+[0-9]/.test(t)) {
-        add('0');
-        add(t.substr(1));
-        console.log(0, t.substr(1));
-      } else {
-        svgArray.push(t);
-        term = '';
-        hasDecimal = false;
-      }
-    }
-  }
-
-  for (let symbol of path.trim()) {
-    if (/\s|,/.test(symbol)) {
-      add(term);
-      continue;
-    }
-    if (/[A-Za-z]/.test(symbol)) {
-      add(term);
-      svgArray.push(symbol);
-      continue;
-    }
-    if (/\d/.test(symbol)) {
-      term += `${symbol}`;
-      continue;
-    }
-    if (symbol === '.') {
-      if (hasDecimal) {
-        add(term);
-        term += '0';
-      }
-      term += symbol;
-      hasDecimal = true;
-    }
-    if (symbol === '-') {
-      add(term);
-      term += symbol;
-    }
-  }
-  add(term);
-
-  
-  for (let i = 0; i < svgArray.length; i++) {
-    if (/\d/.test(svgArray[i])) {
-      // number
-      svgArray[i] = parseFloat(parseFloat(svgArray[i] * scale).toPrecision(precision)); // rx, scale
-    } else {
-      // do arcs manually
-      if (svgArray[i] === 'A' || svgArray[i] === 'a') {
-        svgArray[i + 1] = parseFloat(parseFloat(svgArray[i + 1] * scale).toPrecision(precision)); // rx, scale
-        svgArray[i + 2] = parseFloat(parseFloat(svgArray[i + 2] * scale).toPrecision(precision)); // ry, scale
-        // +3 rotation, don't change
-        // +4 boolean flag, don't change
-        // +5 boolean flag, don't change
-        i += 5; // skip to next argument
-      }
-    }
-  }
-
-  const scaledPath = svgArray
-    .join(' ')
-    .replace(/\s*([A-Za-z])\s*/g, '$1')
-    .replace(/ -/g, '-')
-    .replace(/-0\./g, '-.');
-
-
-  document.getElementById('output').textContent = scaledPath;
-
-
-  document.getElementById('inputPath').setAttribute('d', path);
-  const output = document.getElementById('output').textContent;
-  document.getElementById('outputPath').setAttribute('d', output);
-
-
-  const bbIn = document.getElementById('inputPath').getBBox();
-  const bbOut = document.getElementById('outputPath').getBBox();
-
-  const offset = {
-    x: Math.abs(bbIn.width - bbOut.width) / 2,
-    y: Math.abs(bbIn.height - bbOut.height) / 2
-  };
-
-  if (bbIn.width >= bbOut.width) {
-    document.getElementById('svgInput').setAttribute('viewBox', `${bbIn.x} ${bbIn.y} ${bbIn.width} ${bbIn.height}`)
-    document.getElementById('svgOutput').setAttribute('viewBox', `${bbOut.x - offset.x} ${bbOut.y - offset.y} ${bbIn.width} ${bbIn.height}`);
-  } else {
-    document.getElementById('svgInput').setAttribute('viewBox', `${bbIn.x - offset.x} ${bbIn.y - offset.y} ${bbOut.width} ${bbOut.height}`)
-    document.getElementById('svgOutput').setAttribute('viewBox', `${bbOut.x} ${bbOut.y} ${bbOut.width} ${bbOut.height}`);
-  }
-
+// Fit both previews to the same scale, each bounding box centred, with padding.
+function fitPreviews() {
+  const boxes = ['inputPath', 'outputPath'].map(id => {
+    try { return $(id).getBBox(); } catch (e) { return { x: 0, y: 0, width: 0, height: 0 }; }
+  });
+  const w = Math.max(boxes[0].width, boxes[1].width);
+  const h = Math.max(boxes[0].height, boxes[1].height);
+  const pad = Math.max(w, h) * NS_PAD || 1;
+  ['svgInput', 'svgOutput'].forEach((id, k) => {
+    const b = boxes[k];
+    const cx = b.x + b.width / 2;
+    const cy = b.y + b.height / 2;
+    const vw = w + 2 * pad;
+    const vh = h + 2 * pad;
+    $(id).setAttribute('viewBox', `${cx - vw / 2} ${cy - vh / 2} ${vw} ${vh}`);
+  });
 }
 
-document.getElementById('path').addEventListener('input', go);
-document.getElementById('scale').addEventListener('input', go);
-document.getElementById('precision').addEventListener('input', go);
+const byteLength = s => new Blob([s]).size;
 
-document.getElementById('copyButton').addEventListener('click', () => {
-  navigator.clipboard.writeText(document.getElementById('output').textContent).then(function () {
-    M.toast({ html: 'Copied to Clipboard' });
-  }, function (err) {
-    M.toast({ html: 'Error Copying to Clipboard' });
+const go = () => {
+  const input = $('path').value;
+  const scale = $('scale').value.trim() === '' ? NaN : Number($('scale').value);
+  const precision = Number($('precision').value);
+  const mode = $('mode').value;
+
+  const show = (out, err, stats, inD, outD) => {
+    $('output').textContent = out;
+    $('error').textContent = err;
+    $('stats').textContent = stats;
+    $('inputPath').setAttribute('d', inD);
+    $('outputPath').setAttribute('d', outD);
+    fitPreviews();
+  };
+
+  if (!isFinite(scale)) return show('', 'Scale must be a finite number.', '', '', '');
+  if (!Number.isInteger(precision) || precision < (mode === 'sig' ? 1 : 0) || precision > 16) {
+    return show('', `Precision must be a whole number from ${mode === 'sig' ? 1 : 0} to 16.`, '', '', '');
+  }
+
+  const r = SVGPath.scaleInput(input, {
+    scale,
+    mode,
+    precision,
+    minify: $('minify').checked,
+    optimize: $('optimize').checked
   });
+
+  const err = r.errors
+    .map(e => `${r.markup ? `Path ${e.path}: ` : ''}${e.message} (character ${e.index + 1}). Output stops at this point.`)
+    .join(' ');
+  const inBytes = byteLength(input);
+  const outBytes = byteLength(r.output);
+  const stats = input.trim() === '' ? '' : `${inBytes} → ${outBytes} bytes (${inBytes ? Math.round((outBytes / inBytes - 1) * 100) : 0}%)`;
+  show(r.output, err, stats, r.paths.join(' '), r.outPaths.join(' '));
+};
+
+['path', 'scale', 'precision', 'mode', 'minify', 'optimize'].forEach(id => {
+  $(id).addEventListener('input', go);
+  $(id).addEventListener('change', go);
 });
+
+$('mode').addEventListener('change', () => {
+  const sig = $('mode').value === 'sig';
+  $('precision').min = sig ? 1 : 0;
+  $('precision').value = sig ? 6 : 3;
+  go();
+});
+
+const copyText = text => {
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+  return new Promise((resolve, reject) => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy') ? resolve() : reject(new Error('copy failed')); } catch (e) { reject(e); }
+    document.body.removeChild(ta);
+  });
+};
+
+let toastTimer;
+const toast = text => {
+  const el = $('toast');
+  el.textContent = text;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+};
+
+$('copyButton').addEventListener('click', () => {
+  copyText($('output').textContent).then(
+    () => toast('Copied to Clipboard'),
+    () => toast('Error Copying to Clipboard')
+  );
+});
+
+go();
